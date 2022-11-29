@@ -1,0 +1,512 @@
+import 'package:flutter/material.dart';
+import 'package:sqflite/sqflite.dart' as sql;
+
+void main() => runApp(LoginScreen());
+
+class LoginScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: LoginHome(),
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+    );
+  }
+}
+
+class LoginHome extends StatefulWidget {
+  @override
+  State<LoginHome> createState() => _LoginHomeState();
+}
+
+class _LoginHomeState extends State<LoginHome> {
+  var usernameController = new TextEditingController();
+  var passwordController = new TextEditingController();
+  bool passenable = true;
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('LOGIN SCREEN'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Card(
+          child: SingleChildScrollView(
+            scrollDirection: Axis.vertical,
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                children: [
+                  CircleAvatar(
+                    radius: 100.0,
+                    backgroundImage: NetworkImage('https://i.gifer.com/7Ne0.gif'),
+                  ),
+                  SizedBox(
+                    height: 20.0,
+                  ),
+                  TextField(
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      hintText: "Enter Username Here",
+                      labelText: 'Username:',
+                      icon: const Padding(
+                        padding: const EdgeInsets.only(top: 15.0),
+                        child: const Icon(Icons.account_circle_rounded),
+                      ),
+                    ),
+                    controller: usernameController,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 16.0,
+                    ),
+                  ),
+                  SizedBox(
+                    height: 20.0,
+                  ),
+                  TextField(
+                    controller: passwordController,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 16.0,
+                    ),
+                    obscureText: passenable,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(),
+                      hintText: "Enter Password Here",
+                      labelText: "Password",
+                      suffix: IconButton(
+                          onPressed: () {
+                            setState(() {
+                              if (passenable) {
+                                passenable = false;
+                              } else {
+                                passenable = true;
+                              }
+                            });
+                          },
+                          icon: Icon(passenable == true
+                              ? Icons.remove_red_eye
+                              : Icons.password)),
+                      icon: const Padding(
+                        padding: const EdgeInsets.only(top: 15.0),
+                        child: const Icon(Icons.lock),
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 20.0,
+                  ),
+                  ElevatedButton(
+                      onPressed: () {
+                        if (usernameController.text == '') {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Username is empty'),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        } else if (passwordController.text == '') {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Password is empty'),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        } else {
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (BuildContext context) => Dashboard()));
+                        }
+                      },
+                      child: Text('LOGIN')),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text('No account?'),
+                      TextButton(
+                        child: Text('Sign up'),
+                        onPressed: () {
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (BuildContext context) => Signup()));
+                        },
+                      )
+                    ],
+                  )
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class Dashboard extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: DashboardHome(),
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+    );
+  }
+}
+
+class DashboardHome extends StatefulWidget {
+  @override
+  State<DashboardHome> createState() => _DashboardHomeState();
+}
+
+class _DashboardHomeState extends State<DashboardHome> {
+  void addUser(BuildContext context) {
+    showModalBottomSheet(
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(25.0))),
+        context: context,
+        isScrollControlled: true,
+        builder: (context) {
+          return Container(
+            color: Colors.white,
+            height: MediaQuery.of(context).size.height / 1.5,
+            child: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 18),
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.vertical,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      SizedBox(
+                        height: 16.0,
+                      ),
+                      CircleAvatar(
+                        radius: 50.0,
+                      ),
+                      SizedBox(
+                        height: 16.0,
+                      ),
+                      TextField(
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: 'Fullname',
+                          hintText: "Enter Fullname",
+                        ),
+                      ),
+                      SizedBox(
+                        height: 16.0,
+                      ),
+                      TextField(
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: 'Block',
+                          hintText: "Enter Block Number",
+                        ),
+                      ),
+                      SizedBox(
+                        height: 16.0,
+                      ),
+                      TextField(
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: 'Year',
+                          hintText: "Enter Year",
+                        ),
+                      ),
+                      SizedBox(
+                        height: 16.0,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          ElevatedButton(
+                            child: Text('Cancel'),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                          SizedBox(
+                            width: 16.0,
+                          ),
+                          ElevatedButton(
+                            child: Text('Add User'),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          );
+        });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('DASHBOARD'),
+      ),
+      drawer: Container(
+        width: 250,
+        child: Drawer(
+          child: ListView(
+            children: [
+              CircleAvatar(
+                radius: 50.0,
+                backgroundImage: NetworkImage('https://i.gifer.com/7Ne0.gif'),
+              ),
+              InkWell(
+                onTap: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (BuildContext context) => User()));
+                },
+                child: ListTile(
+                    leading: Icon(Icons.verified_user),
+                    title: Text('List of Users')),
+              )
+            ],
+          ),
+        ),
+      ),
+      body: Card(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(20.0),
+          scrollDirection: Axis.vertical,
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                CircleAvatar(
+                  radius: 80.0,
+                  backgroundImage: NetworkImage('https://i.gifer.com/7Ne0.gif'),
+                ),
+                Center(),
+                SizedBox(
+                  height: 20.0,
+                ),
+                SizedBox(
+                  height: 20.0,
+                ),
+                ElevatedButton(
+                    onPressed: () {}, child: Text('Roemar John Sarion')),
+                SizedBox(
+                  height: 20.0,
+                ),
+                ElevatedButton(
+                    onPressed: () {
+                      showDialog(
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (BuildContext context) {
+                            return StatefulBuilder(
+                                builder: (context, setState) {
+                              return AlertDialog(
+                                title: Text('Warning!'),
+                                content: SingleChildScrollView(
+                                  child: ListBody(children: [
+                                    Center(
+                                      child: Text(
+                                          'Are you sure you want to Log Out?'),
+                                    )
+                                  ]),
+                                ),
+                                actions: [
+                                  TextButton(
+                                    child: Text('Cancel'),
+                                    onPressed: () {
+                                      Navigator.of(context).push(
+                                          MaterialPageRoute(
+                                              builder: (BuildContext context) =>
+                                                  LoginScreen()));
+                                      Navigator.of(context).pop();
+                                    },
+                                  ),
+                                  TextButton(
+                                    child: Text('Log Out'),
+                                    onPressed: () {
+                                      Navigator.of(context).push(
+                                          MaterialPageRoute(
+                                              builder: (BuildContext context) =>
+                                                  LoginScreen()));
+                                    },
+                                  ),
+                                ],
+                              );
+                            });
+                          });
+                    },
+                    child: Text('LOG OUT')),
+              ],
+            ),
+          ),
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            addUser(context);
+          },
+          child: Icon(Icons.add)),
+    );
+  }
+}
+
+class Signup extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: SignupHome(),
+      theme: ThemeData(
+        primarySwatch: Colors.red,
+      ),
+    );
+  }
+}
+
+class SignupHome extends StatelessWidget {
+  var firstnameController = new TextEditingController();
+  var middlenameController = new TextEditingController();
+  var lastnameController = new TextEditingController();
+  var birthdateController = new TextEditingController();
+  var courseController = new TextEditingController();
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Sign Up'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Card(
+          elevation: 50.0,
+          child: SingleChildScrollView(
+            scrollDirection: Axis.vertical,
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                children: [
+                  SizedBox(
+                    height: 20.0,
+                  ),
+                  TextField(
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      labelText: 'Firstname:',
+                    ),
+                    controller: firstnameController,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 15.0,
+                    ),
+                  ),
+                  SizedBox(
+                    height: 35.0,
+                  ),
+                  TextField(
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      labelText: 'Middlename:',
+                    ),
+                    controller: middlenameController,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 15.0,
+                    ),
+                  ),
+                  SizedBox(
+                    height: 20.0,
+                  ),
+                  TextField(
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      labelText: 'Lastname:',
+                    ),
+                    controller: lastnameController,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 15.0,
+                    ),
+                  ),
+                  SizedBox(
+                    height: 20.0,
+                  ),
+                  TextField(
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      labelText: 'Birthdate:',
+                    ),
+                    controller: birthdateController,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 15.0,
+                    ),
+                  ),
+                  SizedBox(
+                    height: 20.0,
+                  ),
+                  TextField(
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      labelText: 'Course:',
+                    ),
+                    controller: courseController,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 15.0,
+                    ),
+                  ),
+                  SizedBox(
+                    height: 20.0,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ElevatedButton(
+                        child: Text('Cancel'),
+                        onPressed: () {
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (BuildContext context) => LoginHome()));
+                        },
+                      ),
+                      SizedBox(
+                        width: 5.0,
+                      ),
+                      ElevatedButton(
+                         onPressed: () {
+                           if (firstnameController.text.isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Firstname is empty'),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          } else if (middlenameController.text.isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Middlename is empty'),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          } else if (lastnameController.text.isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Lastname is empty'),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          } else if 
+                         }
+                      ),
+                    ],
+                  ),
+                    
